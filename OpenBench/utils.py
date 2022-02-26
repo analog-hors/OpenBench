@@ -486,6 +486,57 @@ def updateTest(request, user):
     )
 
     # Force a refresh of the updated field when finished
-    if finished: Test.objects.get(id=testid).save()
+    if finished:
+        Test.objects.get(id=testid).save()
+
+        # Send update to webhook, if it exists
+        if 'webhook' in OPENBENCH_CONFIG:
+            lower, elo, upper = OpenBench.stats.ELO(test.wins, test.losses, test.draws)
+            error = max(upper - elo, elo - lower)
+            elo   = OpenBench.templatetags.mytags.twoDigitPrecision(elo)
+            error = OpenBench.templatetags.mytags.twoDigitPrecision(error)
+            h0 = OpenBench.templatetags.mytags.twoDigitPrecision(test.elolower)
+            h1 = OpenBench.templatetags.mytags.twoDigitPrecision(test.eloupper)
+            tokens = test.devoptions.split(' ')
+            threads = tokens[0].split('=')[1]
+            hash = tokens[1].split('=')[1]
+            requests.post(OPENBENCH_CONFIG['webhook'], json={
+                "username": test.engine,
+                "embeds": [{
+                    "title": f"Test `{test.dev.name}` vs `{test.base.name}` {'passed' if passed else 'failed'}",
+                    "url": request.build_absolute_uri(f"/test/{testid}"),
+                    "color": 0x37F769 if passed else 0xFA4E4E if test.wins < test.losses else 0xFEFF58,
+                    "author": { "name": test.author },
+                    "fields": [
+                        {
+                            "name": "Configuration",
+                            "value": f"{test.timecontrol}s Threads={threads} Hash={hash}MB",
+                        },
+                        {
+                            "name": "Mode",
+                            "value": f"{test.max_games} games" if test.test_mode == "GAMES" else f"SPRT [{h0}, {h1}]",
+                        },
+                        {
+                            "name": "Wins",
+                            "value": f"{test.wins}",
+                            "inline": True,
+                        },
+                        {
+                            "name": "Losses",
+                            "value": f"{test.losses}",
+                            "inline": True,
+                        },
+                        {
+                            "name": "Draws",
+                            "value": f"{test.draws}",
+                            "inline": True,
+                        },
+                        {
+                            "name": "Elo",
+                            "value": f"{elo} ± {error} (95%)",
+                        },
+                    ]
+                }]
+            })
 
     return ['None', 'Stop'][finished]
