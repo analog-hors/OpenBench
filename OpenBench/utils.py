@@ -491,7 +491,7 @@ def updateTest(request, user):
 
         # Send update to webhook, if it exists
         if 'webhook' in OPENBENCH_CONFIG:
-            lower, elo, upper = OpenBench.stats.ELO(test.wins, test.losses, test.draws)
+            lower, elo, upper = OpenBench.stats.ELO(swins, slosses, sdraws)
             error = max(upper - elo, elo - lower)
             elo   = OpenBench.templatetags.mytags.twoDigitPrecision(elo)
             error = OpenBench.templatetags.mytags.twoDigitPrecision(error)
@@ -505,7 +505,7 @@ def updateTest(request, user):
                 "embeds": [{
                     "title": f"Test `{test.dev.name}` vs `{test.base.name}` {'passed' if passed else 'failed'}",
                     "url": request.build_absolute_uri(f"/test/{testid}"),
-                    "color": 0x37F769 if passed else 0xFA4E4E if test.wins < test.losses else 0xFEFF58,
+                    "color": 0x37F769 if passed else 0xFA4E4E if swins < slosses else 0xFEFF58,
                     "author": { "name": test.author },
                     "fields": [
                         {
@@ -518,17 +518,17 @@ def updateTest(request, user):
                         },
                         {
                             "name": "Wins",
-                            "value": f"{test.wins}",
+                            "value": f"{swins}",
                             "inline": True,
                         },
                         {
                             "name": "Losses",
-                            "value": f"{test.losses}",
+                            "value": f"{slosses}",
                             "inline": True,
                         },
                         {
                             "name": "Draws",
-                            "value": f"{test.draws}",
+                            "value": f"{sdraws}",
                             "inline": True,
                         },
                         {
