@@ -140,9 +140,9 @@ def prettyName(name):
     return name
 
 def prettyDevName(test):
-    if test.dev.name == test.base.name and test.devnetwork != '':
+    if test.dev.name == test.base.name and test.devnetname != '':
         try: return OpenBench.models.Network.objects.get(sha256=test.devnetwork).name
-        except: pass # File has since been deleted ?
+        except: return test.devnetname # File has since been deleted ?
     return prettyName(test.dev.name)
 
 def testIsFRC(test):
@@ -152,6 +152,12 @@ def resolveNetworkURL(sha256):
     if OpenBench.models.Network.objects.filter(sha256=sha256):
         return '/networks/download/{0}'.format(sha256)
     return sha256 # Legacy Networks
+
+def testIdToPrettyName(test_id):
+    return prettyName(OpenBench.models.Test.objects.get(id=test_id).dev.name)
+
+def testIdToTimeControl(test_id):
+    return OpenBench.models.Test.objects.get(id=test_id).timecontrol
 
 register = django.template.Library()
 register.filter('oneDigitPrecision', oneDigitPrecision)
@@ -166,3 +172,5 @@ register.filter('prettyName', prettyName)
 register.filter('prettyDevName', prettyDevName)
 register.filter('testIsFRC', testIsFRC)
 register.filter('resolveNetworkURL', resolveNetworkURL)
+register.filter('testIdToPrettyName', testIdToPrettyName)
+register.filter('testIdToTimeControl', testIdToTimeControl)
