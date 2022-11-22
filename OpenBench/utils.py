@@ -377,29 +377,25 @@ def test_maps_onto_thread_count(machine, test):
     return dev_threads != base_threads or machine.threads % dev_threads == 0
 
 def select_workload(machine, tests, variance=0.25):
+    if any(test.games < 1000 for test in tests):
+        tests = [test for test in tests if test.games < 1000]
 
-    # Determine how many threads are assigned to each workload
-    table = { test : 0 for test in tests }
-    for m in getRecentMachines():
-        if m.workload in tests and m != machine:
-            table[m.workload] = table[m.workload] + m.threads
+    def tc(test):
+        pattern = '(?P<moves>(\d+/)?)(?P<base>\d*(\.\d+)?)(?P<inc>\+(\d+\.)?\d+)?'
+        results = re.search(pattern, test.timecontrol)
+        return float(results.group('base'))
 
-    # Find the tests most deserving of resources currently
-    ratios = [table[test] / test.throughput for test in tests]
-    lowest_idxs = [i for i, r in enumerate(ratios) if r == min(ratios)]
+    def threads(test):
+        dev_threads  = int(extractOption(test.devoptions,  'Threads'))
+        base_threads = int(extractOption(test.baseoptions, 'Threads'))
+        return max(dev_threads, base_threads)
 
-    # Machine is out of date; or there is an unassigned test
-    if machine.workload not in tests or min(ratios) == 0:
-        return tests[random.choice(lowest_idxs)]
+    def weight(test):
+        return (abs(test.currentllr) + 1)**2 * test.throughput / tc(test) / threads(test)
 
-    # No test has less than (1-variance)% of its deserved resources, and
-    # therefore we may have this machine repeat its existing workload again
-    ideal_ratio = sum(table.values()) / sum([x.throughput for x in tests])
-    if min(ratios) / ideal_ratio > 1 - variance:
-        return machine.workload
+    weights = [weight(test) for test in tests]
 
-    # Fallback to simply doing the least attention given test
-    return tests[random.choice(lowest_idxs)]
+    return random.choices(tests, weights)[0]
 
 def workload_to_dictionary(test, result, machine):
 
