@@ -23,7 +23,7 @@ USE_CROSS_APPROVAL = False
 OPENBENCH_CONFIG = {
 
     # Server Client version control
-    'client_version' : '3',
+    'client_version' : '4',
 
     # Generic Error Messages useful to those setting up their own instance
     'error' : {
@@ -76,6 +76,12 @@ OPENBENCH_CONFIG = {
             'name'    : 'Pohl.epd',
             'sha'     : 'b3e64e0dab84cf451a9ac7ef031f5a2bbcf16c7e21be95298fb03cbf021f5466',
             'source'  : 'https://raw.githubusercontent.com/AndyGrant/OpenBench/master/Books/Pohl.epd.zip',
+        },
+
+        'Pohl.pgn' : {
+            'name'    : 'Pohl.pgn',
+            'sha'     : 'aaa7559c5d94e592fe5cca3586cb099d8fc5f13428d4ce84afc4b97811241c7e',
+            'source'  : 'https://raw.githubusercontent.com/AndyGrant/OpenBench/master/Books/Pohl.pgn.zip',
         },
 
         'DFRC.epd' : {
@@ -233,7 +239,7 @@ OPENBENCH_CONFIG = {
             'nps'    : 850000,
             'base'   : 'master',
             'book'   : 'Pohl.epd',
-            'bounds' : '[0.00, 5.00]',
+            'bounds' : '[0.00, 3.00]',
             'source' : 'https://github.com/vshcherbyna/igel',
 
             'build' : {
@@ -260,7 +266,7 @@ OPENBENCH_CONFIG = {
 
             'build' : {
                 'path'      : '',
-                'compilers' : ['clang++'],
+                'compilers' : ['clang++', 'g++'],
                 'cpuflags'  : ['POPCNT'],
             },
 
@@ -409,7 +415,7 @@ OPENBENCH_CONFIG = {
             'nps'    : 1150000,
             'base'   : 'main',
             'book'   : 'Pohl.epd',
-            'bounds' : '[-1.00, 4.00]',
+            'bounds' : '[0.00, 3.00]',
             'source' : 'https://github.com/jhonnold/berserk',
 
             'build' : {
@@ -419,8 +425,8 @@ OPENBENCH_CONFIG = {
             },
 
             'testmodes' : [
-                { 'id' : 'STC',     'th' : 1, 'hash' :   8, 'tc' : '8.0+0.08' },
-                { 'id' : 'LTC',     'th' : 1, 'hash' :  64, 'tc' : '40.0+0.4' },
+                { 'id' : 'STC',     'th' : 1, 'hash' :   8, 'tc' : '10.0+0.1' },
+                { 'id' : 'LTC',     'th' : 1, 'hash' :  64, 'tc' : '60.0+0.6' },
                 { 'id' : 'SMP STC', 'th' : 8, 'hash' :  64, 'tc' : '5.0+0.05' },
                 { 'id' : 'SMP LTC', 'th' : 8, 'hash' : 256, 'tc' : '20.0+0.2' },
             ],
@@ -464,6 +470,28 @@ OPENBENCH_CONFIG = {
 
             'testmodes' : [
                 { 'id' : 'STC',     'th' : 1, 'hash' :   8, 'tc' : '8.0+0.08' },
+                { 'id' : 'LTC',     'th' : 1, 'hash' :  64, 'tc' : '40.0+0.4' },
+                { 'id' : 'SMP STC', 'th' : 8, 'hash' :  64, 'tc' : '5.0+0.05' },
+                { 'id' : 'SMP LTC', 'th' : 8, 'hash' : 256, 'tc' : '20.0+0.2' },
+            ],
+        },
+
+        '4ku' : {
+
+            'nps'    : 2000000,
+            'base'   : 'master',
+            'book'   : 'Pohl.pgn',
+            'bounds' : '[0.00, 5.00]',
+            'source' : 'https://github.com/kz04px/4ku',
+
+            'build' : {
+                'path'      : '',
+                'compilers' : ['g++'],
+                'cpuflags'  : ['POPCNT'],
+            },
+
+            'testmodes' : [
+                { 'id' : 'STC',     'th' : 1, 'hash' :  64, 'tc' : '8.0+0.08' },
                 { 'id' : 'LTC',     'th' : 1, 'hash' :  64, 'tc' : '40.0+0.4' },
                 { 'id' : 'SMP STC', 'th' : 8, 'hash' :  64, 'tc' : '5.0+0.05' },
                 { 'id' : 'SMP LTC', 'th' : 8, 'hash' : 256, 'tc' : '20.0+0.2' },
