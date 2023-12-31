@@ -113,10 +113,17 @@ def filter_valid_workloads(tests, machine, distribution):
     # Skip tests that would waste available Threads or exceed them
     options = [x for x in tests if valid_assignment(machine, x, distribution)]
 
-    # Finally refine for tests of the highest priority
+    # Refine for tests of the highest priority
     if not options: return []
     highest_prio = max(options, key=lambda x: x.priority).priority
-    return [test for test in options if test.priority == highest_prio]
+    options = [test for test in options if test.priority == highest_prio]
+
+    # Prioritize new tests
+    min_games = min(options, key=lambda x: x.games).games
+    if min_games < 1024:
+        options = [test for test in options if test.games == min_games]
+
+    return options
 
 def valid_assignment(machine, test, distribution):
 
