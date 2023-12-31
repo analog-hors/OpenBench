@@ -917,10 +917,3 @@ def api_pgns(request, pgn_id):
     response['Content-Length'] = os.path.getsize(pgn_path)
     response['Content-Disposition'] = 'attachment; filename=%d.pgn.tar' % (pgn_id)
     return response
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#                                BUSINESS VIEWS                               #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-def buyEthereal(request):
-    return render(request, 'buyEthereal.html')
